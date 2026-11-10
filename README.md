@@ -1,0 +1,35 @@
+# Litloop × Otari — presentation slides
+
+[Presenterm](https://github.com/mfontanini/presenterm) deck for the
+**Mozilla Otari Hackathon — Devs Wilding** submission:
+*AI book-metadata enrichment — grounded, judged, reversible*.
+
+## Run it
+
+```sh
+cargo install presenterm     # https://mfontanini.github.io/presenterm
+presenterm presentation.md
+```
+
+Tips:
+
+- The three `mermaid` slides render as real diagrams when `mermaid-cli` is
+  installed: `npm i -g @mermaid-js/mermaid-cli` (plus `puppeteer` deps).
+  Without it, presenterm prints them as syntax-highlighted code — and they
+  also render natively when you open `presentation.md` on GitHub.
+- Navigate with `→`/`←` (or `space`), quit with `q`. See `presenterm --help`
+  for presenter-remote options.
+
+## What's inside
+
+- Problem → architecture → the five pipeline phases
+- The judge gate diagram (cited vs verbatim vs rejected)
+- The cover-replacement tiers (cited source wins after vision gating)
+- Escalation story (open-weight first, frontier fallback)
+- Live before/after results for four books, honest tradeoffs,
+  and the submission checklist
+
+## Links
+
+- Litloop: <https://github.com/nebiyuelias1/litloop> (branch: `feat/ai-cover-image`)
+- Otari: <https://otari.ai> · <https://github.com/mozilla-ai/otari>
