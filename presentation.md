@@ -17,7 +17,9 @@ Litloop (book-club app, Amharic + English library) had rules-based metadata only
 
 **Goal:** improve book metadata with AI — grounded, sourced, reversible.
 
-Note: run with `presenterm presentation.md` (mermaid slides need mermaid-cli installed).
+Run: `presenterm presentation.md` — the three flowcharts use `+render` and turn into real
+
+diagrams live (mmdc/mermaid-cli 12.2.0 already installed).
 
 ---
 
@@ -41,7 +43,7 @@ Note: everything below = 4 stacked PRs on one hackathon branch.
 
 ## Architecture
 
-```mermaid
+```mermaid +render
 flowchart TD
   B[books table + audit JSON] --> G
   subgraph GROUND["1. GROUND (open-weight, web search)"]
@@ -136,7 +138,7 @@ One **strict structured-output** call — per-field verdicts:
 
 ## Cite-gates — confidence is mechanical
 
-```mermaid
+```mermaid +render
 flowchart LR
   UP["judge proposes update"] --> Q1{"source_url is a<br/>cited source?"}
   Q1 -- yes --> H["apply · conf HIGH"]
@@ -208,7 +210,7 @@ Everything is **reversible**: originals stored in `book.enrichment` JSON.
 
 ## Cover replacement — cited source wins
 
-```mermaid
+```mermaid +render
 flowchart LR
   J["judge-cited cover page<br/>tier 110"] --> P["candidates queue"]
   W["Wikipedia article<br/>imageinfo API · tier 100"] --> P

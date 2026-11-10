@@ -13,10 +13,10 @@ presenterm presentation.md
 
 Tips:
 
-- The three `mermaid` slides render as real diagrams when `mermaid-cli` is
-  installed: `npm i -g @mermaid-js/mermaid-cli` (plus `puppeteer` deps).
-  Without it, presenterm prints them as syntax-highlighted code — and they
-  also render natively when you open `presentation.md` on GitHub.
+- The three `mermaid +render` slides render as real diagrams in presenterm
+  (mermaid-cli `mmdc` is required: `npm i -g @mermaid-js/mermaid-cli`).
+  Viewed on GitHub, those blocks show as plain code — the deck in a real
+  terminal (or exported PDF via `presenterm -e`) is where diagrams shine.
 - Navigate with `→`/`←` (or `space`), quit with `q`. See `presenterm --help`
   for presenter-remote options.
 
