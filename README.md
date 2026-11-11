@@ -41,4 +41,4 @@ A tight demo deck (10 slides):
 - Litloop: <https://github.com/nebiyuelias1/litloop> (branch: `feat/club-literature-dna`, PR #137 → `otari-hackthon`)
 - Books MCP: <https://github.com/projectahi/books-mcp>
 - Otari: <https://otari.ai> · <https://github.com/mozilla-ai/otari>
-- Neba: <https://github.com/nebiyuelias1> · nebiyu@508.dev
+- Nebiyu Elias: <https://github.com/nebiyuelias1> · nebiyu@508.dev

@@ -1,7 +1,7 @@
 ---
 title: "Litloop × Otari"
 sub_title: "nebiyu@508.dev · github.com/nebiyuelias1"
-author: "Neba · Nebiyu Elias"
+author: "Nebiyu Elias"
 event: "Mozilla Otari Hackathon — Devs Wilding (Nov 8–11, 2026)"
 theme:
   name: light
@@ -11,32 +11,15 @@ options:
 
 ## The problem
 
-Litloop — an OS for book clubs (Amharic + English) — had rules-based metadata only:
-
-- *"The Alchemist"* filed under **Business & Economics**
-- no country of origin at all
-- English descriptions for an Amharic book club
-- covers = unsplash placeholders, randomly low-res
-
-Google Books / Open Library are thin for Ethiopian titles.
-
-**Goal:** improve book metadata with AI — grounded, sourced, reversible.
+- Litloop's library metadata was rules-based: wrong categories, no country of origin, English-only descriptions, placeholder covers.
+- Google Books and Open Library are too thin for Ethiopian and Amharic titles.
 
 ---
 
 ## What we built
 
-One Rails pipeline where **every AI call flows through the Otari gateway** —
-one virtual key, open-weight models by default:
-
-```
-books table ──▶ GROUND ──▶ JUDGE ──▶ SEE ──▶ VALIDATE ──▶ APPLY ──▶ audit
-```
-
-- gateway-run **web search**, **code execution**, **MCP servers**
-- strict **structured outputs**, **Files API** vision
-- Ruby-side gates — **no model output is trusted**
-- every write reversible: originals + provenance in an audit JSON
+- One Rails pipeline routes every AI call through the Otari gateway — grounding, judging, vision, cover swaps — with Ruby-side gates so no model output is trusted.
+- Every write is reversible: originals and provenance stored in an audit JSON.
 
 ---
 
@@ -140,7 +123,7 @@ client.chat(..., mcp_server_ids: [ENV["OTARI_MCP_BOOK_SERVER_ID"]])
 
 ![image:width:28%](nebiyu.png)
 
-**Neba** — 7+ years full-stack · Ethiopia 🇪🇹 → Taiwan 🇹🇼
+**Nebiyu Elias** — 7+ years full-stack · Ethiopia 🇪🇹 → Taiwan 🇹🇼
 ASUS · 508.dev · COSCUP 2026 speaker
 
 - Litloop: `github.com/nebiyuelias1/litloop` — PR #137
