@@ -51,7 +51,7 @@ flowchart TD
   end
   F --> J
   subgraph JUDGE["2. JUDGE (strict json_schema)"]
-    J[per-field verdicts:\nkeep_existing | update + source + quote]
+    J["per-field verdicts:\nkeep_existing | update + source + quote"]
   end
   J --> V
   subgraph SEE["3. SEE — vision gate (Files API)"]
