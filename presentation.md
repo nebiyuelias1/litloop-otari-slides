@@ -3,6 +3,10 @@ title: "Litloop × Otari"
 sub_title: "AI book-metadata enrichment — grounded, judged, reversible"
 author: "Nebiyu Elias · nebiyuelias1/litloop"
 event: "Mozilla Otari Hackathon — Devs Wilding (Nov 8–11, 2026)"
+theme:
+  name: light
+options:
+  end_slide_shorthand: true
 ---
 
 ## The problem

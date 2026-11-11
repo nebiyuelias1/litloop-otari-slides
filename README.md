@@ -13,6 +13,10 @@ presenterm presentation.md
 
 Tips:
 
+- Slide breaks use `---` via the frontmatter `options.end_slide_shorthand: true`
+  (presenterm's default separator is the `<!-- end_slide -->` comment — without
+  that option the whole deck collapses into 2 slides).
+- The deck uses the built-in `light` theme (white background).
 - The three `mermaid +render` slides render as real diagrams in presenterm
   (mermaid-cli `mmdc` is required: `npm i -g @mermaid-js/mermaid-cli`).
   Viewed on GitHub, those blocks show as plain code — the deck in a real
