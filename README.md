@@ -26,15 +26,15 @@ Tips:
 
 ## What's inside
 
-- Problem → architecture → the five pipeline phases
-- The judge gate diagram (cited vs verbatim vs rejected)
-- The cover-replacement tiers (cited source wins after vision gating)
-- Escalation story (open-weight first, frontier fallback)
-- Live before/after results for four books, honest tradeoffs,
-  and the submission checklist
-- Day 2: the self-hosted **books MCP server**, MCP-grounded enrichment
-  (with the citation-whitelist fix), the three cover-swap bugs and their
-  live-verified fixes, day-2 results, and the budget ledger
+A 5-minute demo deck (~20–25s per slide):
+
+- Problem → one-gateway architecture → ground & judge → cite-gates
+- Cover vision gate (and the 'Into the Wild' story)
+- Live before/after results for five books
+- Literature DNA via **Otari code execution** (sandbox matplotlib)
+- **Budgets** — per-user monthly quota, per-call ledger
+- Day 2: the self-hosted **books MCP server** and MCP-grounded enrichment
+- Honest tradeoffs, submission checklist
 
 ## Links
 
