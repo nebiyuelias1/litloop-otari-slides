@@ -26,18 +26,19 @@ Tips:
 
 ## What's inside
 
-A 5-minute demo deck (~20–25s per slide):
+A tight demo deck (10 slides):
 
-- Problem → one-gateway architecture → ground & judge → cite-gates
-- Cover vision gate (and the 'Into the Wild' story)
-- Live before/after results for five books
-- Literature DNA via **Otari code execution** (sandbox matplotlib)
+- Problem → one-gateway pipeline → **code-level architecture** (Ruby classes
+  × which LLM does what)
+- Cite-gates (HIGH / MEDIUM / rejected), cover vision-gate flow,
+  Literature DNA via **Otari code execution**
 - **Budgets** — per-user monthly quota, per-call ledger
-- Day 2: the self-hosted **books MCP server** and MCP-grounded enrichment
-- Honest tradeoffs, submission checklist
+- The self-hosted **books MCP server**
+- Closing: bio, photo and all the links
 
 ## Links
 
 - Litloop: <https://github.com/nebiyuelias1/litloop> (branch: `feat/club-literature-dna`, PR #137 → `otari-hackthon`)
 - Books MCP: <https://github.com/projectahi/books-mcp>
 - Otari: <https://otari.ai> · <https://github.com/mozilla-ai/otari>
+- Neba: <https://github.com/nebiyuelias1> · nebiyu@508.dev
