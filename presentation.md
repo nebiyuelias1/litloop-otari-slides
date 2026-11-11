@@ -299,20 +299,102 @@ deepseek-vl  : 9 calls    $ 0.0011
 
 ---
 
+## Day 2 — enter the books MCP server
+
+Discovery got its own infrastructure: a **self-hosted books MCP server**
+(Cloudflare Worker) aggregating Google Books + Open Library + Project
+Gutenberg, deduplicated by ISBN, D1-cached with a 7-day freshness TTL.
+
+- Registered **once** in the Otari dashboard (Tools → MCP servers):
+  workspace-scoped id, purpose hint, `allowed_tools` allowlist
+- The gateway runs the MCP loop inside a normal chat completion —
+  `otari_tool_calls` shows `type: "mcp"` per call
+
+```ruby
+client.chat(
+  model: "openai/gpt-oss-120b",
+  messages: [{ role: "user", content: "Find well-rated books about cryptography" }],
+  mcp_server_ids: [ENV["OTARI_MCP_BOOK_SERVER_ID"]]
+)
+# → 6 tool calls: search_books, get_book … all status "completed"
+```
+
+---
+
+## MCP-grounded enrichment (why it beat web search)
+
+The old grounding starved the judge: *"So Long a Letter"* web search
+returned a **646-byte fact pile**, and the description update was rejected
+**three times** — no citation ever passed the gate.
+
+- prompt now says: **prefer the MCP tools** — `search_books` → `get_book`
+  by ISBN → exact description, ratings, identifiers, source URLs
+- citation whitelist now **harvests URLs from MCP tool-call outputs**
+  (web-search calls carry `sources`; MCP calls don't — real bug, fixed)
+- description gate mirrors the country gate: a wrong `source_url` no longer
+  **vetoes** a verbatim quote → medium confidence applies
+- audit records `description_source_url` / `description_confidence`
+
+Live: *So Long a Letter* description applied **HIGH**; the Amharic
+**መኃለየ መኃልይ** got an Amharic description + country `ET` HIGH.
+
+---
+
+## Debugging the cover swap — three real bugs, all live-verified
+
+1. **`Net::HTTP` doesn't follow redirects** — OL work pages `301` into
+   silence, OL covers `302` to archive.org (the winning cover needed
+   *two* hops). Now: a redirect-following helper + non-success logging.
+2. **Models annotate URLs** — `https://openlibrary.org/works/… (Open
+   Library – multiple edition covers)` → `URI must be ascii only` →
+   *every* AI candidate died. Now: bare URL extracted before use.
+3. **Google Books cover URLs have no file extension** — the judge-cited
+   real cover fell through the image branch silently. Now: extensionless
+   citations tried directly as images (+ a `zoom=2` larger render).
+
+Plus: junk (Goodreads user photos, site icons) outranked the real cover and
+ate the vision budget — mined images demoted, chrome filter added,
+budget 3→5. The pipeline once swapped **'Into the Wild'** onto
+*Things Fall Apart*. 😅 Vision now catches that, verified.
+
+---
+
+## Day-2 live results
+
+| book | before | after |
+|---|---|---|
+| So Long a Letter (#2472) | empty description, no cover path | description **HIGH** via MCP record + real OL cover through a 2-redirect chain |
+| Things Fall Apart (#2471) | **wrong book's cover** ('Into the Wild') | judge-cited Google Books cover, vision-verified |
+| መኃለየ መኃልይ (Amharic) | no description, no country | Amharic description + country `ET`, both cited HIGH |
+| The Code Book (probe) | — | 2-source merged record: GB metadata + OL ratings |
+
+Also shipped: `OtariUsage`/`OtariBudget` — every call metered against a
+per-user monthly quota (admins exempt), and **320 tests / 1402 assertions
+green** across the whole backend.
+
+---
+
 ## Submission checklist
 
-- **Repo:** `nebiyuelias1/litloop` · **branch:** `feat/ai-cover-image`
+- **Repo:** `nebiyuelias1/litloop` · **branch:** `feat/club-literature-dna`
+  · **PR #137 → `otari-hackthon`**
 - **First Otari commit:** `c197ee1` — "add Otari AI gateway client service"
 - **Otari features:** chat completions · structured outputs · gateway-run web
-  search · Files API vision · usage/budget dashboard
-- **Demo:** admin button → queued job → before/after books 75/76/79/85 + audit JSON walk
+  search · Files API vision · **workspace-scoped MCP servers** · budgets +
+  usage dashboard
+- **Tests:** 320 runs, 1402 assertions, 0 failures
+- **Demo:** admin button → queued job → before/after books 75/76/79/85 +
+  audit JSON walk; MCP: books 2471/2472 before/after
 - **Feedback:** this deck, the log trace, the friction list above
 
 ---
 
 ## Thanks / Try it
 
-- Litloop: `github.com/nebiyuelias1/litloop` — branch `feat/ai-cover-image`
+- Litloop: `github.com/nebiyuelias1/litloop` — branch
+  `feat/club-literature-dna` (PR #137)
+- Books MCP: `github.com/projectahi/books-mcp` — self-hosted on a free
+  Cloudflare Worker
 - Otari: `otari.ai` · `github.com/mozilla-ai/otari`
 - Star the repo, ping me on the Discord — and bring an Amharic book!
 

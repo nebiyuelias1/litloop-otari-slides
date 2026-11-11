@@ -28,8 +28,12 @@ Tips:
 - Escalation story (open-weight first, frontier fallback)
 - Live before/after results for four books, honest tradeoffs,
   and the submission checklist
+- Day 2: the self-hosted **books MCP server**, MCP-grounded enrichment
+  (with the citation-whitelist fix), the three cover-swap bugs and their
+  live-verified fixes, day-2 results, and the budget ledger
 
 ## Links
 
-- Litloop: <https://github.com/nebiyuelias1/litloop> (branch: `feat/ai-cover-image`)
+- Litloop: <https://github.com/nebiyuelias1/litloop> (branch: `feat/club-literature-dna`, PR #137 → `otari-hackthon`)
+- Books MCP: <https://github.com/projectahi/books-mcp>
 - Otari: <https://otari.ai> · <https://github.com/mozilla-ai/otari>
