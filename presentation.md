@@ -45,27 +45,15 @@ Note: everything below = 4 stacked PRs on one hackathon branch.
 
 ```mermaid +render
 flowchart TD
-  B[books table + audit JSON] --> G
-  subgraph GROUND["1. GROUND (open-weight, web search)"]
-    G[otari_web_search · max_uses 3] --> F[facts + cited sources]
-  end
-  F --> J
-  subgraph JUDGE["2. JUDGE (strict json_schema)"]
-    J["per-field verdicts:\nkeep_existing | update + source + quote"]
-  end
-  J --> V
-  subgraph SEE["3. SEE — vision gate (Files API)"]
-    V[DeepSeek V4.1 Flash: real cover? matches? res?]
-  end
-  V --> VA
-  subgraph VALIDATE["4. VALIDATE (pure Ruby — no LLM)"]
-    VA[citation gates · ISO whitelist · image probes · vision budget]
-  end
-  VA --> A
-  subgraph APPLY["5. APPLY — reversible"]
-    A[persist + audit originals/sources]
-  end
+  B["📚 book record"] --> G
+  G["1 · GROUND\nfacts + cited sources"] --> J
+  J["2 · JUDGE\nstrict json_schema"] --> V
+  V["3 · SEE\nvision gate"] --> VA
+  VA["4 · VALIDATE\npure Ruby"] --> A
+  A["5 · APPLY\nreversible + audit"]
 ```
+
+*every box has its own slide — nothing is trusted, everything is gated*
 
 ---
 
@@ -212,13 +200,13 @@ Everything is **reversible**: originals stored in `book.enrichment` JSON.
 
 ```mermaid +render
 flowchart LR
-  J["judge-cited cover page<br/>tier 110"] --> P["candidates queue"]
-  W["Wikipedia article<br/>imageinfo API · tier 100"] --> P
-  OL["Open Library ISBN<br/>tier 80"] --> P
-  CP["Commons + og:image<br/>tier 40"] --> P
-  P --> VG{"download probe +<br/>vision gate"}
-  VG -- "real cover, matches" --> SW["swap + audit JSON"]
-  VG -- "rejected / budget spent" --> KEEP["old cover stays"]
+  J["judge-cited · 110"] --> P
+  W["wikipedia · 100"] --> P
+  OL["open library · 80"] --> P
+  M["og mining · 60"] --> P
+  P["candidates"] --> VG{"probe + vision"}
+  VG -- "real + matches" --> SW["swap + audit"]
+  VG -- rejected --> KEEP["old cover stays"]
 ```
 
 - **cited_source is tier 110**: what the research named as the real cover
@@ -301,61 +289,46 @@ deepseek-vl  : 9 calls    $ 0.0011
 
 ## Day 2 — enter the books MCP server
 
-Discovery got its own infrastructure: a **self-hosted books MCP server**
-(Cloudflare Worker) aggregating Google Books + Open Library + Project
-Gutenberg, deduplicated by ISBN, D1-cached with a 7-day freshness TTL.
+A **self-hosted books MCP server** (Cloudflare Worker):
+Google Books + Open Library + Project Gutenberg,
+deduplicated by ISBN, cached 7 days.
 
-- Registered **once** in the Otari dashboard (Tools → MCP servers):
-  workspace-scoped id, purpose hint, `allowed_tools` allowlist
-- The gateway runs the MCP loop inside a normal chat completion —
-  `otari_tool_calls` shows `type: "mcp"` per call
+- registered once in the Otari dashboard: purpose hint + tool allowlist
+- the gateway runs the tool loop — the app just sends:
 
 ```ruby
-client.chat(
-  model: "openai/gpt-oss-120b",
-  messages: [{ role: "user", content: "Find well-rated books about cryptography" }],
-  mcp_server_ids: [ENV["OTARI_MCP_BOOK_SERVER_ID"]]
-)
-# → 6 tool calls: search_books, get_book … all status "completed"
+client.chat(..., mcp_server_ids: [ENV["OTARI_MCP_BOOK_SERVER_ID"]])
+# → search_books, get_book … all completed
 ```
 
 ---
 
-## MCP-grounded enrichment (why it beat web search)
+## MCP-grounded enrichment
 
-The old grounding starved the judge: *"So Long a Letter"* web search
-returned a **646-byte fact pile**, and the description update was rejected
-**three times** — no citation ever passed the gate.
+The old grounding starved the judge: *So Long a Letter* →
+**646-byte fact pile** → description rejected **3×**.
 
-- prompt now says: **prefer the MCP tools** — `search_books` → `get_book`
-  by ISBN → exact description, ratings, identifiers, source URLs
-- citation whitelist now **harvests URLs from MCP tool-call outputs**
-  (web-search calls carry `sources`; MCP calls don't — real bug, fixed)
-- description gate mirrors the country gate: a wrong `source_url` no longer
-  **vetoes** a verbatim quote → medium confidence applies
-- audit records `description_source_url` / `description_confidence`
+Now:
 
-Live: *So Long a Letter* description applied **HIGH**; the Amharic
-**መኃለየ መኃልይ** got an Amharic description + country `ET` HIGH.
+- prompt says **prefer the MCP tools** — `get_book` by ISBN
+- MCP outputs join the citation whitelist *(a real bug: they didn't)*
+- a wrong `source_url` no longer vetoes a verbatim quote
+
+Live: *So Long a Letter* description **HIGH** ·
+**መኃለየ መኃልይ** → Amharic description + country `ET` **HIGH**
 
 ---
 
-## Debugging the cover swap — three real bugs, all live-verified
+## Debugging the cover swap — three real bugs
 
-1. **`Net::HTTP` doesn't follow redirects** — OL work pages `301` into
-   silence, OL covers `302` to archive.org (the winning cover needed
-   *two* hops). Now: a redirect-following helper + non-success logging.
-2. **Models annotate URLs** — `https://openlibrary.org/works/… (Open
-   Library – multiple edition covers)` → `URI must be ascii only` →
-   *every* AI candidate died. Now: bare URL extracted before use.
-3. **Google Books cover URLs have no file extension** — the judge-cited
-   real cover fell through the image branch silently. Now: extensionless
-   citations tried directly as images (+ a `zoom=2` larger render).
+| bug | fix |
+|---|---|
+| redirects never followed — OL pages `301` into silence, covers `302` to archive.org | follow redirects, log non-success |
+| models annotate URLs → `URI must be ascii only` → all AI candidates died | extract the bare URL |
+| Google Books cover URLs have no extension → judge-cited cover silently dropped | try cited URLs as direct images |
 
-Plus: junk (Goodreads user photos, site icons) outranked the real cover and
-ate the vision budget — mined images demoted, chrome filter added,
-budget 3→5. The pipeline once swapped **'Into the Wild'** onto
-*Things Fall Apart*. 😅 Vision now catches that, verified.
+And once, the pipeline put **'Into the Wild'** on
+*Things Fall Apart* 😅 — junk now filtered, budget 3→5.
 
 ---
 
@@ -363,14 +336,11 @@ budget 3→5. The pipeline once swapped **'Into the Wild'** onto
 
 | book | before | after |
 |---|---|---|
-| So Long a Letter (#2472) | empty description, no cover path | description **HIGH** via MCP record + real OL cover through a 2-redirect chain |
-| Things Fall Apart (#2471) | **wrong book's cover** ('Into the Wild') | judge-cited Google Books cover, vision-verified |
-| መኃለየ መኃልይ (Amharic) | no description, no country | Amharic description + country `ET`, both cited HIGH |
-| The Code Book (probe) | — | 2-source merged record: GB metadata + OL ratings |
+| So Long a Letter | empty description | **HIGH** via MCP + real OL cover |
+| Things Fall Apart | wrong book's cover | cited cover, vision-verified |
+| መኃለየ መኃልይ (Amharic) | no description, no country | Amharic desc + `ET`, both HIGH |
 
-Also shipped: `OtariUsage`/`OtariBudget` — every call metered against a
-per-user monthly quota (admins exempt), and **320 tests / 1402 assertions
-green** across the whole backend.
+Plus `OtariBudget` metering and **320 tests green**.
 
 ---
 
